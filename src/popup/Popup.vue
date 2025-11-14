@@ -21,23 +21,24 @@
   </div>
 </template>
 <script>
-const _ = require('lodash');
-const browser = require("webextension-polyfill");
-const {getLatLonZoom, getAllMaps} = require('../maps');
-const storage = require('../options/storage');
+import _ from 'lodash';
+import browser from "webextension-polyfill";
+import {getLatLonZoom, getAllMaps} from '../maps';
+import {observableEnabledMaps, observablePreferences} from '../options/storage';
 function normalizeLon(lon) {
   return ((((Number(lon) + 180) % 360) + 360) % 360) - 180;
-};
-module.exports = {
+}
+
+export default {
   computed: {
     columns() {
-      const enabledMaps = _.filter(getAllMaps(), map => storage.observableEnabledMaps[map.name]);
+      const enabledMaps = _.filter(getAllMaps(), map => observableEnabledMaps[map.name]);
       return _.groupBy(enabledMaps, 'category');
-    },
+    }
   },
   methods: {
     openMapInCurrentTab(map) {
-		if (storage.observablePreferences['alwaysOpenInNewTab']){//
+		if (observablePreferences['alwaysOpenInNewTab']){
 			this.openMapInOtherTab(map);
 			return;
 		}
@@ -61,8 +62,8 @@ module.exports = {
     },
     openOptionsPage() {
       browser.runtime.openOptionsPage();
-    },
-  },
+    }
+  }
 };
 </script>
 <style>
@@ -115,23 +116,23 @@ module.exports = {
 
   .column {
     display: inline-block;
-	vertical-align: top;
+	  vertical-align: top;
     white-space: nowrap;
-	width: 150px;
-	//float:left;
-	//clear:both;
-	overflow: hidden;
+	  width: 150px;
+	/*float:left;*/
+  /*clear:both;*/
+	  overflow: hidden;
   }
-  
+
   #mapmenu {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
-	//width: 450px;
-	//column-count: 3;
-  	//display:flex;
-	//flex-direction: row;
-	//flex-wrap: wrap;
-	//flex-flow: 3 wrap;
+	/*width: 450px;*/
+	/*column-count: 3;*/
+  /*display:flex;*/
+	/*flex-direction: row;*/
+	/*flex-wrap: wrap;*/
+	/*flex-flow: 3 wrap;*/
 
   }
 </style>

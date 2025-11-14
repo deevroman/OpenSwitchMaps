@@ -1,20 +1,14 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-module.exports = {
-  getAllMaps,
-  isMatchingAMap,
-  getLatLonZoom,
-};
-
-function getAllMaps() {
+export function getAllMaps() {
   return maps;
 }
 
-function isMatchingAMap(url) {
+export function isMatchingAMap(url) {
   return _.some(maps, map => _.invoke(map, 'getLatLonZoom', url));
 }
 
-function getLatLonZoom(url) {
+export function getLatLonZoom(url) {
   const map = _.find(maps, map => _.invoke(map, 'getLatLonZoom', url));
   if (map) {
     return map.getLatLonZoom(url);
@@ -124,7 +118,7 @@ const maps = [
 					} else {
 
 					}
-					
+
 				}
 				*/
 				let pin_match = url.match(/google.*maps\/place\/.*!3d(-?\d[0-9.]*)!4d(-?\d[0-9.]*)/);
@@ -257,7 +251,7 @@ const maps = [
 				} else {
 					return [lat, lon, zoom];
 				}
-				
+
 			}
 		},
 	},
@@ -898,7 +892,7 @@ const maps = [
 		  return [lat, lon, Math.round(zoom)];
 		}
 	  },
-  
+
 	},
 	*/
 
@@ -2455,7 +2449,7 @@ const maps = [
 			const [west, south, east, north] = latLonZoomToBbox(lat, lon, zoom);
 			const params = `{"initSources":[{"initialCamera":{"west":${west},"south":${south},"east":${east},"north":${north}}}]}`;
 			const encoded = encodeURI(params);
-			url = `https://plateauview.jp/#start=${encoded}`;
+			const url = `https://plateauview.jp/#start=${encoded}`;
 			return url;
 		},
 	},
@@ -2544,7 +2538,7 @@ const maps = [
 		description: "Sunrise, sunset, sun direction",
 		getUrl(lat, lon, zoom) {
 		  return `http://suncalc.net/#/${lat},${lon},${zoom}`;
-  
+
 		},
 		getLatLonZoom(url) {
 		  const match = url.match(/#\/(-?\d[0-9.]*),(-?\d[0-9.]*),(\d[0-9.]*)/);
@@ -2666,7 +2660,7 @@ const maps = [
 		description: "Create a map every single road within a city",
 		getUrl(lat, lon, zoom) {
 		  return `https://anvaka.github.io/city-roads/?q=${lat}%2C%20${lon}`;
-  
+
 		},
 	  },
 	  */
@@ -3236,7 +3230,7 @@ const maps = [
 		},
 		getLatLonZoom(url) {
 			const pic_selected = url.match(/pic=/);
-			
+
 			let match;
 			//https://api.panoramax.xyz/#focus=map&map=7.32/35.346/139.692&speed=250
 			//https://panoramax.ign.fr/#focus=map&map=6.46/46.651/5.877&speed=250
@@ -3249,7 +3243,7 @@ const maps = [
 				} else {
 					return [lat, lon, zoom];
 				}
-				
+
 			}
 		},
 	},
@@ -3276,5 +3270,3 @@ const maps = [
 		},
 	},
 ];
-
-

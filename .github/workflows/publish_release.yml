@@ -1,0 +1,52 @@
+name: Build and publish extension release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ firefox, chrome ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: TARGET=${{ matrix.target }} npm run build
+
+      - id: prepare_zip
+        name: Prepare ZIP
+        run: |
+          VERSION=$(node -e "console.log(require('./dist/${{ matrix.target }}/manifest.json').version)")
+          TIMESTAMP=$(git show -s --format=%cd --date=format:%Y-%m-%dT%H-%M-%S $GITHUB_SHA)
+          COMMIT_HASH=$(echo "$GITHUB_SHA" | cut -c1-7)
+          ZIP_NAME="OpenSwitchMaps-${{ matrix.target }}-${VERSION}-${TIMESTAMP}-${COMMIT_HASH}"
+          cd dist/${{ matrix.target }} && zip -r "../../$ZIP_NAME.zip" .
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        run: |
+          TAG="${{ steps.prepare_zip.outputs.version }}"
+          ZIP="${{ steps.prepare_zip.outputs.zip_name }}.zip"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists, uploading asset..."
+            gh release upload "$TAG" "$ZIP" --clobber
+          else
+            echo "Release $TAG not found, creating..."
+            gh release create "$TAG" "$ZIP" --title "$TAG" --notes "Automated release created by CI for $TAG."
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

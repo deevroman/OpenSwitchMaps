@@ -1,0 +1,49 @@
+name: Build extension
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build-and-release:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ firefox, chrome ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension
+        run: TARGET=${{ matrix.target }} npm run build
+
+      - id: prepare_zip
+        name: Prepare ZIP
+        run: |
+          VERSION=$(node -e "console.log(require('./dist/${{ matrix.target }}/manifest.json').version)")
+          TIMESTAMP=$(git show -s --format=%cd --date=format:%Y-%m-%dT%H-%M-%S $GITHUB_SHA)
+          COMMIT_HASH=$(echo "$GITHUB_SHA" | cut -c1-7)
+          ZIP_NAME="OpenSwitchMaps-${{ matrix.target }}-${VERSION}-${TIMESTAMP}-${COMMIT_HASH}"
+          cd dist/${{ matrix.target }} && zip -r "../../$ZIP_NAME.zip" .
+          echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepare_zip.outputs.zip_name }}
+          path: ${{ steps.prepare_zip.outputs.zip_name }}.zip

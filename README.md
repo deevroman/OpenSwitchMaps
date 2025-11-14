@@ -16,11 +16,11 @@ Greatly contributed by jazzzz. Thanks!
 + [Chrome webstore](https://chrome.google.com/webstore/detail/openswitchmaps/cfkddjlocfecchnemnnmmpdjcohgmkij)
 + [Firefox addon center](https://addons.mozilla.org/firefox/addon/openswitchmaps/)
 ### from source code
-This extention uses Node.js
+This extension uses Node.js
 1. Install Node.js
-1. Install the dependencies: npm install
-1. Build the extension: npm run build
-1. The extension is built in the `dist` directory
+1. Install the dependencies: `npm install`
+1. Build the extension: `TARGET=firefox npm run build` (or `TARGET=chrome npm run build`)
+1. The extension is built in the `dist/firefox` directory
 1. Add to your Chrome/Firefox 
 
 ## How to use

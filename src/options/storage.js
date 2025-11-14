@@ -1,9 +1,9 @@
-const browser = require("webextension-polyfill");
-const _ = require('lodash');
-const Vue = require('vue').default;
-const {getAllMaps} = require('../maps');
+import browser from 'webextension-polyfill';
+import _ from 'lodash';
+import { reactive } from 'vue';
+import { getAllMaps } from '../maps.js';
 
-const storage = browser.storage;
+export const storage = browser.storage;
 const storageArea = storage.sync || storage.local;
 
 const mapNames = _.map(getAllMaps(), 'name');
@@ -14,29 +14,29 @@ const mapChecks = _.map(getAllMaps(), function (map){
 		return false;
 	};
 });
-const enabledMaps = Vue.observable(_.zipObject(mapNames, mapChecks));
-const preferences = Vue.observable({
+
+const enabledMaps = reactive(_.zipObject(mapNames, mapChecks));
+const preferences = reactive({
 	'alwaysOpenInNewTab': false,
 });
 
 init();
 
-module.exports = {
-  init,
-  observableEnabledMaps: enabledMaps,
-  observablePreferences: preferences,
-  setMapEnabled,
-  setPreference,
+export { init,
+    enabledMaps as observableEnabledMaps,
+    preferences as observablePreferences,
+    setMapEnabled,
+    setPreference
 };
 
 function init() {
-  storageArea.get('enabledMaps').then((stored) => {
-    _.extend(enabledMaps, stored.enabledMaps);
-  });
-  storageArea.get('preferences').then((stored) => {
-    _.extend(preferences, stored.preferences);
-  });
-  storage.onChanged.addListener(onChanged);
+    storageArea.get('enabledMaps').then((stored) => {
+      _.assign(enabledMaps, stored.enabledMaps);
+    });
+    storageArea.get('preferences').then((stored) => {
+      _.assign(preferences, stored.preferences);
+    });
+  storageArea.onChanged.addListener(onChanged);
 }
 
 function setMapEnabled(map, enabled) {
@@ -49,6 +49,6 @@ function setPreference(item, preference) {
 }
 
 function onChanged(changes) {
-  _.extend(enabledMaps, changes.enabledMaps.newValue);
-  _.extend(preferences, changes.preferences.newValue);
+  _.assign(enabledMaps, changes.enabledMaps.newValue);
+  _.assign(preferences, changes.preferences.newValue);
 }

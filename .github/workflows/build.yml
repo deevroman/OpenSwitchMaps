@@ -2,7 +2,7 @@ name: Build extension
 
 on:
   push:
-    tags:
+    branches:
       - 'master'
 
 jobs:

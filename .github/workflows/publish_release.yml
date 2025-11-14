@@ -36,7 +36,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         with:
-          version: ${{ steps.prepare_zip.outputs.version }}
+          tag_name: ${{ steps.prepare_zip.outputs.version }}
           release_name: ${{ steps.prepare_zip.outputs.version }}
           body: |
             Automated release created by CI for ${{ steps.prepare_zip.outputs.version }}.

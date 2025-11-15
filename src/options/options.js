@@ -1,4 +1,4 @@
-const Vue = require('vue').default;
-const Options = require('./Options.vue');
+import { createApp } from 'vue';
+import Options from './Options.vue';
 
-new Vue(Options).$mount('#options');
+createApp(Options).mount('#options');

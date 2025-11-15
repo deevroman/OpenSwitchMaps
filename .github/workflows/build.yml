@@ -9,6 +9,9 @@ jobs:
   build-and-release:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ firefox, chrome ]
 
     steps:
       - name: Checkout repository
@@ -23,15 +26,15 @@ jobs:
         run: npm ci
 
       - name: Build extension
-        run: npm run build
+        run: TARGET=${{ matrix.target }} npm run build
 
       - id: prepare_zip
         name: Prepare ZIP
         run: |
-          VERSION=$(node -e "console.log(require('./package.json').version)")
+          VERSION=$(node -e "console.log(require('./dist/${{ matrix.target }}/manifest.json').version)")
           COMMIT_HASH=$(echo "$GITHUB_SHA" | cut -c1-7)
-          ZIP_NAME="OpenSwitchMaps-${VERSION}-${COMMIT_HASH}.zip"
-          cd dist && zip -r "../$ZIP_NAME" .
+          ZIP_NAME="OpenSwitchMaps-${{ matrix.target }}-${VERSION}-${COMMIT_HASH}"
+          cd dist/${{ matrix.target }} && zip -r "../../$ZIP_NAME.zip" .
           echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -39,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.prepare_zip.outputs.zip_name }}
-          path: ${{ steps.prepare_zip.outputs.zip_name }}
+          path: ${{ steps.prepare_zip.outputs.zip_name }}.zip

@@ -1,4 +1,4 @@
-const Vue = require('vue').default;
-const Popup = require('./Popup.vue');
+import { createApp } from 'vue';
+import Popup from './Popup.vue';
 
-new Vue(Popup).$mount('#popup');
+createApp(Popup).mount('#popup');

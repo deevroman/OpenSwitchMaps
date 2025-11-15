@@ -3,8 +3,8 @@
   "version": "1.5.5",
   "description": "Switch map services, and some useful links for OpenStreetMap contributors",
   "scripts": {
-    "dev": "mkdir -p src/_locales && parcel watch src/manifest.json",
-    "build": "mkdir -p src/_locales && parcel build src/manifest.json"
+    "dev": "cp src/manifest_$TARGET.json src/manifest.json && parcel watch src/manifest.json --dist-dir dist/$TARGET",
+    "build": "cp src/manifest_$TARGET.json src/manifest.json && parcel build src/manifest.json --config @parcel/config-webextension --dist-dir dist/$TARGET"
   },
   "repository": {
     "type": "git",
@@ -17,17 +17,16 @@
   },
   "homepage": "https://github.com/tankaru/OpenSwitchMaps#readme",
   "devDependencies": {
-    "@vue/component-compiler-utils": "^3.2.0",
-    "parcel-bundler": "^1.12.5",
-    "parcel-plugin-web-extension": "^1.6.1",
-    "vue-template-compiler": "^2.6.12"
+    "@parcel/config-webextension": "^2.16.1",
+    "@parcel/transformer-vue": "^2.16.1",
+    "parcel": "^2.16.1"
   },
   "dependencies": {
     "lodash": "^4.17.21",
     "node-forge": ">=1.3.0",
     "ol": "^6.5.0",
-    "vue": "^2.6.12",
+    "vue": "^3.5.24",
     "vue-hot-reload-api": "^2.3.4",
-    "webextension-polyfill": "^0.6.0"
+    "webextension-polyfill": "^0.12.0"
   }
 }

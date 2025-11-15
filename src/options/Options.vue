@@ -38,11 +38,11 @@
   </div>
 </template>
 <script>
-const _ = require('lodash');
-const storage = require('./storage');
-const {getAllMaps} = require('../maps');
+import _ from 'lodash';
+import * as storage from './storage.js';
+import { getAllMaps } from '../maps.js';
 
-module.exports = {
+export default {
   data() {
     return {
       columns: _.groupBy(getAllMaps(), 'category'),

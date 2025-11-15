@@ -7,6 +7,9 @@ jobs:
   build-and-release:
     name: Build and publish
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ firefox, chrome ]
 
     steps:
       - name: Checkout repository
@@ -21,20 +24,21 @@ jobs:
         run: npm ci
 
       - name: Build extension
-        run: npm run build
+        run: TARGET=${{ matrix.target }} npm run build
 
       - id: prepare_zip
         name: Prepare ZIP
         run: |
-          VERSION=$(node -e "console.log(require('./package.json').version)")
-          ZIP_NAME="OpenSwitchMaps-${VERSION}.zip"
-          (cd dist && zip -r "../$ZIP_NAME" .)
+          VERSION=$(node -e "console.log(require('./dist/${{ matrix.target }}/manifest.json').version)")
+          COMMIT_HASH=$(echo "$GITHUB_SHA" | cut -c1-7)
+          ZIP_NAME="OpenSwitchMaps-${{ matrix.target }}-${VERSION}-${COMMIT_HASH}"
+          cd dist/${{ matrix.target }} && zip -r "../../$ZIP_NAME.zip" .
           echo "zip_name=$ZIP_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create release
         run: |
-          gh release create "${{ steps.prepare_zip.outputs.version }}" "${{ steps.prepare_zip.outputs.zip_name }}" \
+          gh release create "${{ steps.prepare_zip.outputs.version }}" "${{ steps.prepare_zip.outputs.zip_name }}.zip" \
             --title "${{ steps.prepare_zip.outputs.version }}" \
             --notes "Automated release created by CI for ${{ steps.prepare_zip.outputs.version }}."
         env:
